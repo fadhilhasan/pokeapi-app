@@ -1,10 +1,7 @@
 import { PokemonDetails } from "../app/types/types";
-import { formatPokemonName } from "../app/utils/utils";
 
 export async function fetchPokemon(name: string): Promise<PokemonDetails> {
-  const response = await fetch(
-    `https://pokeapi.co/api/v2/pokemon/${formatPokemonName(name)}`
-  );
+  const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
 
   if (!response.ok) {
     throw new Error(`Error fetching ${name}`);
@@ -18,7 +15,6 @@ export async function fetchPokemon(name: string): Promise<PokemonDetails> {
     hp: result.stats[0].base_stat,
     attack: result.stats[1].base_stat,
     defense: result.stats[2].base_stat,
-    // name: result.name,
   };
   return pokemon;
 }

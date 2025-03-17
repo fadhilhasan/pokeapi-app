@@ -1,30 +1,32 @@
 import { Pokemon } from "../app/types/types";
-import { formatPokemonName } from "../app/utils/utils";
 
 export async function fetchPokemons(): Promise<Pokemon[]> {
-  const response = await fetch(
-    "https://unpkg.com/pokemons@1.1.0/pokemons.json"
-  );
+  const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10");
 
   if (!response.ok) {
     throw new Error("Failed to fetch pokemons");
   }
 
-  const results = await response.json();
+  const result = await response.json();
 
-  const pokemons = results.results.map((pokemon: any) => ({
-    name: pokemon.name,
-    id: pokemon.national_number,
-    tipo: pokemon.type,
-    imgSrc: `https://img.pokemondb.net/sprites/black-white/anim/normal/${formatPokemonName(
-      pokemon.name.toLowerCase()
-    )}.gif`,
-  }));
+  const pokemonDetailsPromises = result.results.map(
+    async (pokemon: { name: string; url: string }) => {
+      const detailsResponse = await fetch(pokemon.url);
+      if (!detailsResponse.ok) {
+        throw new Error(`Error fetching details for ${pokemon.name}`);
+      }
+      const details = await detailsResponse.json();
 
-  const uniquePokemons = pokemons.filter(
-    (pokemon: Pokemon, index: number, self: Pokemon[]) =>
-      index === self.findIndex((p: Pokemon) => p.id === pokemon.id)
+      return {
+        name: details.name,
+        id: details.id,
+        type: details.types.map((t: any) => t.type.name),
+        imgSrc: `https://img.pokemondb.net/sprites/black-white/anim/normal/${details.name.toLowerCase()}.gif`, // Gunakan GIF dari pokemondb.net
+      };
+    }
   );
 
-  return uniquePokemons;
+  const pokemonList = await Promise.all(pokemonDetailsPromises);
+
+  return pokemonList;
 }

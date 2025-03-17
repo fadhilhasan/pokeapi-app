@@ -17,81 +17,106 @@ export const Pokemons = () => {
     const fetchAllPokemons = async () => {
       setIsLoading(true);
       await waitFor(500);
-      const allPokemons = await fetchPokemons();
-      setPokemons(allPokemons);
+      try {
+        const allPokemons = await fetchPokemons();
+        setPokemons(allPokemons);
+      } catch (error) {
+        console.error("Error fetching pokemons:", error);
+      }
       setIsLoading(false);
-    }
+    };
     fetchAllPokemons();
-  },[]);
+  }, []);
 
-  if (isLoading || !pokemons){
-    return <Cargando/>
+  if (isLoading) {
+    return <Cargando />;
   }
-  
-  const filteredPokemons = pokemons?.slice(0, 151).filter((pokemon) =>  {
-    return pokemon.name.toLowerCase().includes(query.toLowerCase())
-  })
+
+  const filteredPokemons = pokemons.filter((pokemon) =>
+    pokemon.name.toLowerCase().includes(query.toLowerCase())
+  );
 
   const getCardColor = (type: string) => {
-    switch (type) {
-      case 'Grass':
+    switch (type.toLowerCase()) {
+      case "grass":
         return Colors.greenAccent;
-      case 'Fire':
+      case "fire":
         return Colors.redAccent;
-      case 'Water':
+      case "water":
         return Colors.blueAccent;
-      case 'Electric':
+      case "electric":
         return Colors.yellowAccent;
-      case 'Rock':
+      case "rock":
         return Colors.fromARGB(255, 132, 99, 51);
-      case 'Ground':
+      case "ground":
         return Colors.fromRGBO(221, 171, 54, 1);
-      case 'Psychic':
+      case "psychic":
         return Colors.pink;
-      case 'Fighting':
+      case "fighting":
         return Colors.orangeAccent;
-      case 'Bug':
+      case "bug":
         return Colors.lightGreenAccent;
-      case 'Ghost':
+      case "ghost":
         return Colors.deepPurple;
-      case 'Normal':
+      case "normal":
         return Colors.grey;
-      case 'Poison':
+      case "poison":
         return Colors.purple;
-      case 'Ice':
+      case "ice":
         return Colors.lightBlueAccent;
       default:
         return Colors.fromARGB(255, 86, 98, 156);
     }
-  }
+  };
 
   return (
     <>
-    <div className="page-content py-5 position-relative ">
-      <Cabecera query={query} setQuery={setQuery} />
-      <main>
-        <h1 className="px-3 py-3">Pokemons</h1>
-        <div className="container">
-          <div className="row">
-            {filteredPokemons?.slice(0, 151).map((pokemon) => (
-              <div className="col-md-2 pb-5" key={pokemon.id}>
-                <div className="card" style={{ backgroundColor: getCardColor(pokemon.tipo[0]) }}>
-                  <img src={pokemon.imgSrc} alt={pokemon.name} className="card-img-top" style={{ width: "80%", height: "200px" }} />
-                  <div className="card-body">
-                    <Link to={`/pokemons/${pokemon.name.toLowerCase()}`} className="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover">
-                      <h4 className="card-title">{pokemon.name}</h4>
-                    </Link>
-                    <p className="card-text">Type: {pokemon.tipo.join(", ")}</p>
+      <div className="page-content py-5 position-relative">
+        <Cabecera query={query} setQuery={setQuery} />
+        <main>
+          <h1 className="px-3 py-5">Pokemons</h1>
+          <div className="container">
+            <div className="row">
+              {filteredPokemons.map((pokemon) => (
+                <div className="col-md-2 pb-5" key={pokemon.id}>
+                  <div
+                    className="card shadow-lg"
+                    style={{
+                      backgroundColor: getCardColor(pokemon.type[0]),
+                    }}
+                  >
+                    <img
+                      src={pokemon.imgSrc}
+                      alt={pokemon.name}
+                      className="card-img-top"
+                      style={{
+                        width: "100%",
+                        height: "200px",
+                        padding: "25px 30px",
+                      }}
+                    />
+                    <div className="card-body">
+                      <Link
+                        to={`/pokemons/${pokemon.name.toLowerCase()}`}
+                        className="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover"
+                      >
+                        <h4 className="card-title">{pokemon.name}</h4>
+                      </Link>
+                      <p className="card-text">
+                        Type: {pokemon.type.join(", ")}
+                      </p>
+                    </div>
+                    <div className="card-footer bg-white">
+                      <p className="text-center text-body-dark">{pokemon.id}</p>
+                    </div>
                   </div>
-                  <div className="card-footer bg-white"><small className="text-body-dark">{pokemon.id}</small></div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </main>
-    </div>
-    <Pie />
+        </main>
+      </div>
+      <Pie />
     </>
   );
-}
+};

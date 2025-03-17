@@ -1,20 +1,18 @@
-import './App.css'
+import "./App.css";
 
 import { BrowserRouter } from "react-router-dom";
-import { Ruteo } from "./app/routes/Ruteo";
-
+import { AppRoutes } from "./app/routes/Route";
 
 function App() {
-
   return (
     <>
       <div>
-      <BrowserRouter>
-          <Ruteo />
+        <BrowserRouter>
+          <AppRoutes />
         </BrowserRouter>
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
